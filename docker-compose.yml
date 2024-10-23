@@ -1,0 +1,36 @@
+
+networks:
+  aluraplay_net:
+    driver: bridge
+    name: aluraplay_net
+
+volumes:
+  aluraplay-mysql-data:
+
+services:
+  web:
+    networks:
+      - aluraplay_net
+    build: .
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    networks:
+      - aluraplay_net
+    environment:
+      - MYSQL_ROOT_PASSWORD=101010
+      - MYSQL_DATABASE=aluraplay
+      - MYSQL_USER=aluraplay
+      - MYSQL_PASSWORD=101010
+    ports:
+      - "3306:3306"
+    volumes:
+      - aluraplay-mysql-data:/var/lib/mysql
+
+
