@@ -71,7 +71,7 @@ class VideoRepository
 
     }
 
-    public function find(int $id)
+    public function find(int $id): Video
     {
         $sql = 'SELECT * FROM videos WHERE id= ?';
         $stmt = $this->pdo->prepare($sql);
@@ -100,18 +100,44 @@ class VideoRepository
         $stmt->execute();
 
         $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$userData) {
+            return false;
+        }
+
         $corretPassword = password_verify($user->password, $userData['password'] ?? '');
 
+        if (password_needs_rehash($userData['password'], PASSWORD_ARGON2ID)) {
+            $stmt = $this->pdo->prepare('UPDATE users SET password = ? WHERE id= ?');
+            $stmt->bindValue(1, password_hash($user->password, PASSWORD_ARGON2ID));
+            $stmt->bindValue(2, $userData['id']);
+            $stmt->execute();
+        }
         return $corretPassword;
-
     }
 
-    public function removeCapa(int $id)
+    public function removeCapa(int $id):void
     {
         $sql = 'UPDATE videos SET image_path = null WHERE id= ?';
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(1, $id, \PDO::PARAM_INT);
         $stmt->execute();
+    }
+
+    public function uploadImage(Video $video): void
+    {
+        if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $fileTempName = uniqid('upload') . '_' . pathinfo($_FILES['image']['name'], PATHINFO_BASENAME);
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mimetype = $finfo->file($_FILES['image']['tmp_name']);
+
+            if (str_starts_with($mimetype, 'image/')) {
+                move_uploaded_file(
+                    $_FILES['image']['tmp_name'],
+                    __DIR__ . '/../../public/img/uploads/' . $fileTempName
+                );
+                $video->setFilepath($fileTempName);
+            }
+        }
     }
 
 

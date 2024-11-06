@@ -11,6 +11,8 @@ return [
     'GET|/login' => \aluraplay\Controller\LoginFormController::class,
     'POST|/login' => \aluraplay\Controller\LoginController::class,
     'GET|/logout' => \aluraplay\Controller\LogoutController::class,
-    'GET|/remover-capa' => \aluraplay\Controller\RemoverCapaController::class
+    'GET|/remover-capa' => \aluraplay\Controller\RemoverCapaController::class,
+    'GET|/videos-json' => \aluraplay\Controller\JsonVideoListController::class,
+    'POST|/videos' => \aluraplay\Controller\NewJsonVideoController::class,
 
 ];

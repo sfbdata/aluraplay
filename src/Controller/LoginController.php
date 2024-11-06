@@ -20,12 +20,13 @@ class LoginController implements Controller
             header('Location: /?sucesso=0');
             exit();
         }
-        $user = new Users($email, $password);
-        $corretPassword = $this->videoRepository->findUser($user);
+        $userData = new Users($email, $password);
+        $corretPassword = $this->videoRepository->findUser($userData);
+
+
 
 
         if($corretPassword) {
-
             $_SESSION['logado'] = true;
             header('Location: /');
         }else {
